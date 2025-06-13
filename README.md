@@ -11,8 +11,10 @@ A PowerShell GUI toolkit for rapid network and firewall diagnostics, management,
 - **Local Tools**: Interface checks, routes, event logs, DNS cache, ARP, TCP/UDP connections, network shares, and more
 - **Firewall Tools**: View status, enable/disable, rule management, export/import, logging, ICMP controls—all PowerShell native
 - **Tooltips and friendly UI**
-- **No admin install required—just run in PowerShell**
+- **No admin install required—just run in an elevated PowerShell terminal**
+Run in PowerShell (from the repo folder):
 
+powershell -ExecutionPolicy Bypass -File .\network-tools.ps1
 ---
 
 ## Requirements
@@ -30,3 +32,8 @@ A PowerShell GUI toolkit for rapid network and firewall diagnostics, management,
 1. **Clone or Download**
    ```sh
    git clone https://github.com/YOURNAME/windows-network-tools-gui.git
+
+Enjoy!
+
+Note: Some buttons (especially on the Firewall tab) require admin privileges to take effect.
+
