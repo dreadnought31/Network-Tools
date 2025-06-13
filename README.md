@@ -12,9 +12,8 @@ A PowerShell GUI toolkit for rapid network and firewall diagnostics, management,
 - **Firewall Tools**: View status, enable/disable, rule management, export/import, logging, ICMP controls—all PowerShell native
 - **Tooltips and friendly UI**
 - **No admin install required—just run in an elevated PowerShell terminal**
-Run in PowerShell (from the repo folder):
+Run in PowerShell (from the repo folder): powershell -ExecutionPolicy Bypass -File .\network-tools.ps1
 
-powershell -ExecutionPolicy Bypass -File .\network-tools.ps1
 ---
 
 ## Requirements
