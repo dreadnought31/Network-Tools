@@ -602,17 +602,9 @@ Get Logs: View last 20 system events
     https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog
 
 Get IP Config: View all adapter configuration
-    https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig
-
 Release IP: Release all DHCP addresses (ipconfig /release)
-    https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig
-
 Renew IP: Request new DHCP addresses (ipconfig /renew)
-    https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig
-
 Show DNS Cache: Display DNS resolver cache
-    https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig
-
 Flush DNS: Clear DNS resolver cache
     https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig
 
