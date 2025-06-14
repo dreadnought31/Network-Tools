@@ -152,6 +152,45 @@ $textPort.Location = New-Object System.Drawing.Point(540, 20)
 $textPort.Size = New-Object System.Drawing.Size(100, 20)
 $tabHost.Controls.Add($textPort)
 
+# --- NEW: Host Command History Dropdown ---
+$hostHistoryLabel = New-Object System.Windows.Forms.Label
+$hostHistoryLabel.Text = "Last 10 Commands:"
+$hostHistoryLabel.Location = New-Object System.Drawing.Point(20, 55)
+$hostHistoryLabel.Size = New-Object System.Drawing.Size(130, 20)
+$tabHost.Controls.Add($hostHistoryLabel)
+
+$hostHistoryBox = New-Object System.Windows.Forms.ComboBox
+$hostHistoryBox.Location = New-Object System.Drawing.Point(150, 55)
+$hostHistoryBox.Size = New-Object System.Drawing.Size(490, 20)
+$hostHistoryBox.DropDownStyle = [System.Windows.Forms.ComboBoxStyle]::DropDownList
+$tabHost.Controls.Add($hostHistoryBox)
+
+$hostCommandHistory = @()
+
+# Populate fields when history is selected
+$hostHistoryBox.add_SelectedIndexChanged({
+    $cmd = $hostHistoryBox.SelectedItem
+    if ($cmd -and $cmd -match '^(\w+)\s+([^\s]+)(?:\s+(\S+))?') {
+        $command = $Matches[1]
+        $target = $Matches[2]
+        $port = if ($Matches[3]) { $Matches[3] } else { "" }
+        $textHost.Text = $target
+        $textPort.Text = $port
+    }
+})
+
+function Add-HostHistory {
+    param([string]$cmdString)
+    # Remove if exists, add to top, keep 10 only
+    $script:hostCommandHistory = @($cmdString) + ($script:hostCommandHistory | Where-Object { $_ -ne $cmdString })
+    if ($script:hostCommandHistory.Count -gt 10) {
+        $script:hostCommandHistory = $script:hostCommandHistory[0..9]
+    }
+    $hostHistoryBox.Items.Clear()
+    $hostCommandHistory | ForEach-Object { $hostHistoryBox.Items.Add($_) } | Out-Null
+    $hostHistoryBox.SelectedIndex = 0
+}
+
 $resultHost = New-Object System.Windows.Forms.TextBox
 $resultHost.Multiline = $true
 $resultHost.ScrollBars = "Vertical"
@@ -163,14 +202,16 @@ $tabHost.Controls.Add($resultHost)
 # Ping
 $pingBtn = New-Object System.Windows.Forms.Button
 $pingBtn.Text = "Ping"
-$pingBtn.Location = New-Object System.Drawing.Point(20, 60)
+$pingBtn.Location = New-Object System.Drawing.Point(20, 90)
 $pingBtn.Size = New-Object System.Drawing.Size(100, 40)
 $pingBtn.Add_Click({
     $target = $textHost.Text.Trim()
+    $cmdString = "Ping $target"
     if ($target) {
         $resultHost.Text = "Running ping $target ..."
         $output = Invoke-ExternalCommand -Command "ping.exe" -Arguments @($target)
         $resultHost.Text = $output
+        Add-HostHistory $cmdString
     } else {
         $resultHost.Text = "Please enter a target host or IP."
     }
@@ -180,14 +221,16 @@ $tabHost.Controls.Add($pingBtn)
 # Tracert
 $tracertBtn = New-Object System.Windows.Forms.Button
 $tracertBtn.Text = "Tracert"
-$tracertBtn.Location = New-Object System.Drawing.Point(140, 60)
+$tracertBtn.Location = New-Object System.Drawing.Point(140, 90)
 $tracertBtn.Size = New-Object System.Drawing.Size(100, 40)
 $tracertBtn.Add_Click({
     $target = $textHost.Text.Trim()
+    $cmdString = "Tracert $target"
     if ($target) {
         $resultHost.Text = "Running tracert $target ..."
         $output = Invoke-ExternalCommand -Command "tracert.exe" -Arguments @($target)
         $resultHost.Text = $output
+        Add-HostHistory $cmdString
     } else {
         $resultHost.Text = "Please enter a target host or IP."
     }
@@ -197,11 +240,12 @@ $tabHost.Controls.Add($tracertBtn)
 # Nmap
 $nmapBtn = New-Object System.Windows.Forms.Button
 $nmapBtn.Text = "Nmap"
-$nmapBtn.Location = New-Object System.Drawing.Point(260, 60)
+$nmapBtn.Location = New-Object System.Drawing.Point(260, 90)
 $nmapBtn.Size = New-Object System.Drawing.Size(100, 40)
 $nmapBtn.Add_Click({
     $target = $textHost.Text.Trim()
     $ports = $textPort.Text.Trim()
+    $cmdString = if ($ports) { "Nmap $target $ports" } else { "Nmap $target" }
     if ($target) {
         $resultHost.Text = "Running nmap $target" + ($(if ($ports) { " on port(s) $ports..." } else { "..." }))
         $nmapPath = "nmap.exe"
@@ -211,6 +255,7 @@ $nmapBtn.Add_Click({
             $output = Invoke-ExternalCommand -Command $nmapPath -Arguments @($target)
         }
         $resultHost.Text = $output
+        Add-HostHistory $cmdString
     } else {
         $resultHost.Text = "Please enter a target host or IP."
     }
@@ -220,16 +265,18 @@ $tabHost.Controls.Add($nmapBtn)
 # Test-NetConnection
 $testNetBtn = New-Object System.Windows.Forms.Button
 $testNetBtn.Text = "Test-NetConnection"
-$testNetBtn.Location = New-Object System.Drawing.Point(380, 60)
+$testNetBtn.Location = New-Object System.Drawing.Point(380, 90)
 $testNetBtn.Size = New-Object System.Drawing.Size(150, 40)
 $testNetBtn.Add_Click({
     $target = $textHost.Text.Trim()
     $ports = $textPort.Text.Trim()
+    $cmdString = if ($ports) { "Test-NetConnection $target $ports" } else { "Test-NetConnection $target" }
     if ($target) {
         if ($ports) {
             try {
                 $output = Test-NetConnection -ComputerName $target -Port ([int]$ports) | Out-String
                 $resultHost.Text = $output
+                Add-HostHistory $cmdString
             } catch {
                 $resultHost.Text = "Error: $($_.Exception.Message)"
             }
@@ -237,6 +284,7 @@ $testNetBtn.Add_Click({
             try {
                 $output = Test-NetConnection -ComputerName $target | Out-String
                 $resultHost.Text = $output
+                Add-HostHistory $cmdString
             } catch {
                 $resultHost.Text = "Error: $($_.Exception.Message)"
             }
@@ -250,19 +298,22 @@ $tabHost.Controls.Add($testNetBtn)
 # Nslookup
 $nslookupBtn = New-Object System.Windows.Forms.Button
 $nslookupBtn.Text = "Nslookup"
-$nslookupBtn.Location = New-Object System.Drawing.Point(550, 60)
+$nslookupBtn.Location = New-Object System.Drawing.Point(550, 90)
 $nslookupBtn.Size = New-Object System.Drawing.Size(100, 40)
 $nslookupBtn.Add_Click({
     $target = $textHost.Text.Trim()
+    $cmdString = "Nslookup $target"
     if ($target) {
         $resultHost.Text = "Running nslookup $target ..."
         $output = Invoke-ExternalCommand -Command "nslookup.exe" -Arguments @($target)
         $resultHost.Text = $output
+        Add-HostHistory $cmdString
     } else {
         $resultHost.Text = "Please enter a target host or IP."
     }
 })
 $tabHost.Controls.Add($nslookupBtn)
+
 
 # ---- Tab 2: Local Tools ----
 $tabLocal = New-Object System.Windows.Forms.TabPage
