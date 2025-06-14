@@ -609,13 +609,11 @@ Flush DNS: Clear DNS resolver cache
     https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig
 
 List TCP Connections: Show active TCP connections
+Check Port Usage: Show all active ports and processes
     https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/netstat
 
 Show Net Shares: List SMB shares
     https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/net-share
-
-Check Port Usage: Show all active ports and processes
-    https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/netstat
 
 ARP -a: Display ARP table
     https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/arp
