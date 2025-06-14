@@ -38,6 +38,46 @@
 .LINK
     https://github.com/dreadnought31/Network-Tools
 #>
+<#
+.SYNOPSIS
+    Network Tools GUI - Cross-Platform PowerShell Network & Firewall Toolkit
+
+.DESCRIPTION
+    A PowerShell-based graphical interface for common host, local, and firewall network diagnostics and management.
+    Features include ping, traceroute, nmap, port checks, DNS tools, TCP/UDP connections, ARP, firewall management, and more.
+    Suitable for IT admins and power users on Windows and Linux.
+
+.AUTHOR
+    Alan O'Brien <aobrien@ehs.com>
+
+.VERSION
+    1.0
+
+.LICENSE
+    GPL-3.0 license
+.LINK
+    https://www.gnu.org/licenses/gpl-3.0.en.html
+
+.REQUIREMENTS
+    - PowerShell 5.1+ (Windows) or PowerShell 7+ (Linux/macOS)
+    - System.Windows.Forms (comes with Windows PowerShell; for Linux, requires PowerShell 7+ and X11)
+    - Admin rights for some features (firewall, ARP, etc.)
+    - Optional: nmap, nc/netcat, ufw/firewalld
+
+.USAGE
+    # Windows:
+    powershell -ExecutionPolicy Bypass -File .\network-gui.ps1
+
+    # Linux (with PowerShell 7+):
+    pwsh ./network-gui-linux.ps1
+
+.NOTES
+    This script is provided as-is, without warranty of any kind. Test in non-production environments first.
+    Contributions and improvements are welcome!
+
+.LINK
+    https://github.com/dreadnought31/Network-Tools
+#>
 Add-Type -AssemblyName System.Windows.Forms
 Add-Type -AssemblyName System.Drawing
 
@@ -237,7 +277,6 @@ $resultLocal.Size = New-Object System.Drawing.Size(820, 300)
 $resultLocal.Font = New-Object System.Drawing.Font("Consolas", 10)
 $tabLocal.Controls.Add($resultLocal)
 
-# Local Tools Buttons (all tooltips removed)
 $checkNetBtn = New-Object System.Windows.Forms.Button
 $checkNetBtn.Text = "Check Network"
 $checkNetBtn.Location = New-Object System.Drawing.Point(20, 20)
@@ -323,20 +362,33 @@ $flushDNSBtn.Add_Click({
 })
 $tabLocal.Controls.Add($flushDNSBtn)
 
-$tcpConnBtn = New-Object System.Windows.Forms.Button
-$tcpConnBtn.Text = "List TCP Connections"
-$tcpConnBtn.Location = New-Object System.Drawing.Point(340, 70)
-$tcpConnBtn.Size = New-Object System.Drawing.Size(160, 35)
-$tcpConnBtn.Add_Click({
-    $resultLocal.Text = "Listing TCP connections ..."
-    $output = Invoke-ExternalCommand -Command "netstat.exe" -Arguments @("-n")
+# RELEASE IP
+$releaseIPBtn = New-Object System.Windows.Forms.Button
+$releaseIPBtn.Text = "Release IP"
+$releaseIPBtn.Location = New-Object System.Drawing.Point(340, 70)
+$releaseIPBtn.Size = New-Object System.Drawing.Size(120, 35)
+$releaseIPBtn.Add_Click({
+    $resultLocal.Text = "Releasing IP addresses ..."
+    $output = Invoke-ExternalCommand -Command "ipconfig.exe" -Arguments @("/release")
     $resultLocal.Text = $output
 })
-$tabLocal.Controls.Add($tcpConnBtn)
+$tabLocal.Controls.Add($releaseIPBtn)
+
+# RENEW IP
+$renewIPBtn = New-Object System.Windows.Forms.Button
+$renewIPBtn.Text = "Renew IP"
+$renewIPBtn.Location = New-Object System.Drawing.Point(480, 70)
+$renewIPBtn.Size = New-Object System.Drawing.Size(120, 35)
+$renewIPBtn.Add_Click({
+    $resultLocal.Text = "Renewing IP addresses ..."
+    $output = Invoke-ExternalCommand -Command "ipconfig.exe" -Arguments @("/renew")
+    $resultLocal.Text = $output
+})
+$tabLocal.Controls.Add($renewIPBtn)
 
 $netSharesBtn = New-Object System.Windows.Forms.Button
 $netSharesBtn.Text = "Show Net Shares"
-$netSharesBtn.Location = New-Object System.Drawing.Point(520, 70)
+$netSharesBtn.Location = New-Object System.Drawing.Point(640, 70)
 $netSharesBtn.Size = New-Object System.Drawing.Size(100, 35)
 $netSharesBtn.Add_Click({
     $resultLocal.Text = "Listing network shares ..."
@@ -347,7 +399,7 @@ $tabLocal.Controls.Add($netSharesBtn)
 
 $portUsageBtn = New-Object System.Windows.Forms.Button
 $portUsageBtn.Text = "Check Port Usage"
-$portUsageBtn.Location = New-Object System.Drawing.Point(640, 70)
+$portUsageBtn.Location = New-Object System.Drawing.Point(20, 120)
 $portUsageBtn.Size = New-Object System.Drawing.Size(120, 35)
 $portUsageBtn.Add_Click({
     $resultLocal.Text = "Checking port usage ..."
@@ -356,9 +408,20 @@ $portUsageBtn.Add_Click({
 })
 $tabLocal.Controls.Add($portUsageBtn)
 
+$tcpConnBtn = New-Object System.Windows.Forms.Button
+$tcpConnBtn.Text = "List TCP Connections"
+$tcpConnBtn.Location = New-Object System.Drawing.Point(160, 120)
+$tcpConnBtn.Size = New-Object System.Drawing.Size(160, 35)
+$tcpConnBtn.Add_Click({
+    $resultLocal.Text = "Listing TCP connections ..."
+    $output = Invoke-ExternalCommand -Command "netstat.exe" -Arguments @("-n")
+    $resultLocal.Text = $output
+})
+$tabLocal.Controls.Add($tcpConnBtn)
+
 $arpBtn = New-Object System.Windows.Forms.Button
 $arpBtn.Text = "ARP -a"
-$arpBtn.Location = New-Object System.Drawing.Point(20, 120)
+$arpBtn.Location = New-Object System.Drawing.Point(340, 120)
 $arpBtn.Size = New-Object System.Drawing.Size(100, 35)
 $arpBtn.Add_Click({
     $resultLocal.Text = "Running arp -a ..."
@@ -539,6 +602,12 @@ Get Logs: View last 20 system events
     https://learn.microsoft.com/en-us/powershell/module/microsoft.powershell.management/get-eventlog
 
 Get IP Config: View all adapter configuration
+    https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig
+
+Release IP: Release all DHCP addresses (ipconfig /release)
+    https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig
+
+Renew IP: Request new DHCP addresses (ipconfig /renew)
     https://learn.microsoft.com/en-us/windows-server/administration/windows-commands/ipconfig
 
 Show DNS Cache: Display DNS resolver cache
