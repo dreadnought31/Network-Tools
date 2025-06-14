@@ -7,7 +7,7 @@ A PowerShell GUI toolkit for rapid network and firewall diagnostics, management,
 
 ## Features
 
-- **Host Tools**: Ping, Traceroute, Nmap, Test-NetConnection, Nslookup
+- **Host Tools**: Ping, Traceroute, Nmap, Test-NetConnection, Nslookup. Remembers last 10 commands that were ran.
 - **Local Tools**: Interface checks, routes, event logs, DNS cache, ARP, TCP/UDP connections, network shares, and more
 - **Firewall Tools**: View status, enable/disable, rule management, export/import, logging, ICMP controls—all PowerShell native
 - **Tooltips and friendly UI**
