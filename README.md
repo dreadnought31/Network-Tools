@@ -36,7 +36,7 @@ Enjoy!
 
 Note: Some buttons (especially on the Firewall tab) require admin privileges to take effect.
 
-![image](https://github.com/user-attachments/assets/41a4e727-9b1a-4d3f-874e-2ae69d38a554)
+![image](https://github.com/user-attachments/assets/c35b6a0f-59be-4eee-b1b6-270177336283)
 
 ![image](https://github.com/user-attachments/assets/bf2fe1c9-8a5a-4a5f-a626-25ebb2a63246)
 
